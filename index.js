@@ -2,6 +2,8 @@
 
 var _       = require('underscore');
 var fs      = require('fs');
+var chardet = require('chardet');
+var iconv = require('iconv-lite');
 
 function GedcomParser(path, callback){
   // Utils regex (line...)
@@ -28,9 +30,13 @@ function GedcomParser(path, callback){
   this.history = [];
 }
 
-GedcomParser.prototype.parse = function(path, callback){
+GedcomParser.prototype.parse = function(path, encoding, callback){
   var that = this;
-  this.readableStream = fs.createReadStream(path);
+  var encoding = chardet.detectFileSync(path);
+
+  this.readableStream = fs.createReadStream(path)
+    .pipe(iconv.decodeStream(encoding))
+    .pipe(iconv.encodeStream('utf-8'));
 
   this.readableStream.on('data', function(chunk) {
       that.lines = chunk.toString('utf-8').split("\n");
