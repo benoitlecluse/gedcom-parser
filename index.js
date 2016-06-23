@@ -30,7 +30,7 @@ function GedcomParser(path, callback){
   this.history = [];
 }
 
-GedcomParser.prototype.parse = function(path, encoding, callback){
+GedcomParser.prototype.parse = function(path, callback){
   var that = this;
   var encoding = chardet.detectFileSync(path);
 
