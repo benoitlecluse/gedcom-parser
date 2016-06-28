@@ -30,28 +30,48 @@ function GedcomParser(path, callback){
   this.history = [];
 }
 
+
 GedcomParser.prototype.parse = function(path, callback){
+  // Encoding dectection
   var that = this;
-  var encoding = chardet.detectFileSync(path);
+  var encodingContent = '';
+  var encoding;
 
-  this.readableStream = fs.createReadStream(path)
-    .pipe(iconv.decodeStream(encoding))
-    .pipe(iconv.encodeStream('utf-8'));
-
-  this.readableStream.on('data', function(chunk) {
-      that.lines = chunk.toString('utf-8').split("\n");
-      // Save the next line start for next chunk
-      that.lines[0] = that.nextLineStart+that.lines[0]
-      that.nextLineStart = that.lines.pop();
-      // Parse the lines
-      for (var i in that.lines) {
-        that.readLine(that.lines[i].trim());
+  var encodingStream = fs.createReadStream(path);
+  encodingStream.on('data', function(chunk) {
+      encodingContent += chunk.toString('utf-8');
+      var matches = encodingContent.match(/[0-9]{1,2} CHAR ([A-Za-z0-9_-]+)/);
+      if (matches) {
+        encoding = matches[1].toLowerCase();
+        encodingStream.destroy();
       }
   });
 
-  this.readableStream.on('end', function() {
-    callback(that);
-  });
+  var parseFile = function() {
+    // Première lecture pour l'encodage
+    that.readableStream = fs.createReadStream(path)
+      .pipe(iconv.decodeStream(encoding))
+      .pipe(iconv.encodeStream('utf-8'));
+
+    that.readableStream.on('data', function(chunk) {
+        that.lines = chunk.toString('utf-8').split("\n");
+        // Save the next line start for next chunk
+        that.lines[0] = that.nextLineStart+that.lines[0]
+        that.nextLineStart = that.lines.pop();
+        // Parse the lines
+        for (var i in that.lines) {
+          that.readLine(that.lines[i].trim());
+        }
+    });
+
+    that.readableStream.on('end', function() {
+      callback(that);
+    });
+  }
+
+  encodingStream.on('close', parseFile);
+  encodingStream.on('end', parseFile);
+
 }
 
 // Read line
