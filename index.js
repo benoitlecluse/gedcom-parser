@@ -50,6 +50,10 @@ GedcomParser.prototype.parse = function(path, callback){
       }
   });
 
+  if (!iconv.encodingExists(encoding)) {
+    encoding = 'windows1252';
+  }
+
   var parseFile = function() {
     // Première lecture pour l'encodage
     that.readableStream = fs.createReadStream(path)
