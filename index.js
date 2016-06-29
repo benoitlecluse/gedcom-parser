@@ -46,13 +46,13 @@ GedcomParser.prototype.parse = function(path, callback){
         if (encoding === 'ansi' || encoding === 'ansel') {
           encoding = 'windows1252';
         }
+        if (!iconv.encodingExists(encoding)) {
+          encoding = 'windows1252';
+        }
         encodingStream.destroy();
       }
   });
 
-  if (!iconv.encodingExists(encoding)) {
-    encoding = 'windows1252';
-  }
 
   var parseFile = function() {
     // Première lecture pour l'encodage
