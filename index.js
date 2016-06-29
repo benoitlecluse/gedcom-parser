@@ -43,6 +43,9 @@ GedcomParser.prototype.parse = function(path, callback){
       var matches = encodingContent.match(/[0-9]{1,2} CHAR ([A-Za-z0-9_-]+)/);
       if (matches) {
         encoding = matches[1].toLowerCase();
+        if (encoding === 'ansi' || encoding === 'ansel') {
+          encoding = 'windows1252';
+        }
         encodingStream.destroy();
       }
   });

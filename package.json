@@ -1,6 +1,6 @@
 {
   "name": "gedcom-parser",
-  "version": "0.0.1",
+  "version": "v0.1.2",
   "description": "a tool to parse a gedcom file",
   "main": "index.js",
   "scripts": {
