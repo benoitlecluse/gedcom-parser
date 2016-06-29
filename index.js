@@ -54,7 +54,7 @@ GedcomParser.prototype.parse = function(path, callback){
       .pipe(iconv.encodeStream('utf-8'));
 
     that.readableStream.on('data', function(chunk) {
-        that.lines = chunk.toString('utf-8').split("\n");
+        that.lines = chunk.toString('utf-8').replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
         // Save the next line start for next chunk
         that.lines[0] = that.nextLineStart+that.lines[0]
         that.nextLineStart = that.lines.pop();
