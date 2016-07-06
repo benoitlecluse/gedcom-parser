@@ -97,9 +97,8 @@ GedcomParser.prototype.readLine = function(line){
         refersTo : this.currentPointer,
         type : dataType
       });
-    } else {
-      this.insertData(dataType, content, lineLevel);
     }
+    this.insertData(dataType, content, lineLevel);
   }
 }
 
