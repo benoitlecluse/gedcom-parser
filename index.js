@@ -25,6 +25,7 @@ function GedcomParser(path, callback){
 
   this.data = [];
   this.relations = [];
+  this.pointers = {};
   this.pointersRelations = [];
 
   this.history = [];
@@ -87,6 +88,7 @@ GedcomParser.prototype.readLine = function(line){
   if (isPointer = line.match(this.pointerLineRegex)) {
     lineLevel = isPointer[1];
     this.currentPointer = isPointer[2];
+    this.insertPointer(isPointer[3], isPointer[2]);
   } else if (isData = line.match(this.dataLineRegex)) {
     lineLevel = isData[1];
     dataType = isData[2];
@@ -102,6 +104,9 @@ GedcomParser.prototype.readLine = function(line){
   }
 }
 
+GedcomParser.prototype.insertPointer = function(pointerType, pointer){
+  this.pointers[pointer] = pointerType;
+}
 
 // Parse line
 GedcomParser.prototype.insertData = function(dataType, content, lineLevel){
@@ -145,7 +150,7 @@ GedcomParser.prototype.getTopPointers = function(pointers){
     var _tops = [];
     if (typeof(_pointer) == "undefined") {
       _tops = [];
-    } else if (_pointer.match(/^@I/) || _pointer.match(/I@$/)) {
+    } else if (this.pointer[_pointer] == 'INDI') {
       localTops.push(_pointer);
     } else {
       var _tops = _.where(that.pointersRelations, {reference: _pointer});
